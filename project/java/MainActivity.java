@@ -835,7 +835,7 @@ public class MainActivity extends Activity
 					_parent.hideScreenKeyboard();
 					return true;
 				}
-				/*
+
 				if (keyCode == KeyEvent.KEYCODE_DEL || keyCode == KeyEvent.KEYCODE_CLEAR)
 				{
 					// EditText deletes two characters at a time, here's a hacky fix
@@ -858,7 +858,7 @@ public class MainActivity extends Activity
 						return true;
 					}
 				}
-				*/
+
 				//Log.i("SDL", "Key " + keyCode + " flags " + event.getFlags() + " action " + event.getAction());
 				return false;
 			}
