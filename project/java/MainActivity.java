@@ -813,6 +813,28 @@ public class MainActivity extends Activity
 		}
 		if(_screenKeyboard != null)
 			return;
+		// modified EditText which listens for "back" soft keyboard key
+		class EditTextIme extends EditText
+		{
+			MainActivity _parent;
+			public EditTextIme(Context context, MainActivity parent, int defStyleAttr)
+			{
+				super(context, null, defStyleAttr);
+				_parent = parent;
+			}
+
+			@Override
+			public boolean onKeyPreIme(int keyCode, KeyEvent event)
+			{
+				if (event.getKeyCode() == KeyEvent.KEYCODE_BACK)
+				{
+				    _parent.hideScreenKeyboard(false);
+				    return true;
+				}
+				return super.onKeyPreIme(keyCode, event);
+			}
+		}
+
 		class simpleKeyListener implements OnKeyListener
 		{
 			MainActivity _parent;
@@ -832,7 +854,7 @@ public class MainActivity extends Activity
 					keyCode == KeyEvent.KEYCODE_BUTTON_3 ||
 					keyCode == KeyEvent.KEYCODE_BUTTON_4 ))
 				{
-					_parent.hideScreenKeyboard();
+					_parent.hideScreenKeyboard(true);
 					return true;
 				}
 
@@ -863,7 +885,7 @@ public class MainActivity extends Activity
 				return false;
 			}
 		};
-		EditText screenKeyboard = new EditText(this, null,
+		EditText screenKeyboard = new EditTextIme(this, this,
 			android.os.Build.VERSION.SDK_INT >= android.os.Build.VERSION_CODES.LOLLIPOP ? android.R.style.TextAppearance_Material_Widget_EditText : android.R.style.TextAppearance_Widget_EditText);
 		String hint = _screenKeyboardHintMessage;
 		screenKeyboard.setHint(hint != null ? hint : getString(R.string.text_edit_click_here));
@@ -907,7 +929,7 @@ public class MainActivity extends Activity
 			}, 300 );
 	};
 
-	public void hideScreenKeyboard()
+	public void hideScreenKeyboard(boolean saveText)
 	{
 		if( keyboardWithoutTextInputShown )
 			showScreenKeyboardWithoutTextInputField(Globals.TextInputKeyboard);
@@ -915,12 +937,15 @@ public class MainActivity extends Activity
 		if(_screenKeyboard == null || ! (_screenKeyboard instanceof EditText))
 			return;
 
-		synchronized(textInput)
+		if (saveText)
 		{
-			String text = ((EditText)_screenKeyboard).getText().toString();
-			for(int i = 0; i < text.length(); i++)
+			synchronized(textInput)
 			{
-				DemoRenderer.nativeTextInput( (int)text.charAt(i), (int)text.codePointAt(i) );
+				String text = ((EditText)_screenKeyboard).getText().toString();
+				for(int i = 0; i < text.length(); i++)
+				{
+					DemoRenderer.nativeTextInput( (int)text.charAt(i), (int)text.codePointAt(i) );
+				}
 			}
 		}
 		DemoRenderer.nativeTextInputFinished();
