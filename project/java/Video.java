@@ -814,7 +814,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer
 		context.showScreenKeyboardWithoutTextInputField(keyboard);
 	}
 
-	public void showScreenKeyboard(final String oldText, int unused) // Called from native code
+	public void showScreenKeyboard(final String oldText, final boolean autoCorrect) // Called from native code
 	{
 		class Callback implements Runnable
 		{
@@ -822,7 +822,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer
 			public String oldText;
 			public void run()
 			{
-				parent.showScreenKeyboard(oldText);
+				parent.showScreenKeyboard(oldText, autoCorrect);
 			}
 		}
 		Callback cb = new Callback();
@@ -838,7 +838,7 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer
 			public MainActivity parent;
 			public void run()
 			{
-				parent.hideScreenKeyboard();
+				parent.hideScreenKeyboard(true);
 			}
 		}
 		Callback cb = new Callback();

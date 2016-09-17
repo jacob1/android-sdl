@@ -114,8 +114,9 @@ extern DECLSPEC int SDLCALL SDL_ANDROID_SetScreenKeyboardFloatingJoystick(int en
 extern DECLSPEC int SDLCALL SDL_ANDROID_SetScreenKeyboardTransparency(int alpha);
 
 /* Show Android QWERTY keyboard, and pass entered text back to application as SDL keypress events,
-   previousText is UTF-8 encoded, it may be NULL, only 256 first bytes will be used, and this call will not block */
-extern DECLSPEC int SDLCALL SDL_ANDROID_ToggleScreenKeyboardTextInput(const char * previousText);
+   previousText is UTF-8 encoded, it may be NULL, only 256 first bytes will be used, and this call will not block
+   autoCorrect toggles whether auto correct is enabled on this keyboard */
+extern DECLSPEC int SDLCALL SDL_ANDROID_ToggleScreenKeyboardTextInput(const char * previousText, int autoCorrect);
 
 /* Show only the bare Android QWERTY keyboard without any text input field, so it won't cover the screen */
 extern DECLSPEC int SDLCALL SDL_ANDROID_ToggleScreenKeyboardWithoutTextInput(void);
@@ -133,7 +134,7 @@ extern DECLSPEC int SDLCALL SDL_ANDROID_ToggleInternalScreenKeyboard(SDL_Interna
 /* Show Android QWERTY keyboard, and pass entered text back to application in a buffer,
    using buffer contents as previous text (UTF-8 encoded), the buffer may be of any size.
    This function will block until user typed all text. */
-extern DECLSPEC int SDLCALL SDL_ANDROID_GetScreenKeyboardTextInput(char * textBuf, int textBufSize);
+extern DECLSPEC int SDLCALL SDL_ANDROID_GetScreenKeyboardTextInput(char * textBuf, int textBufSize, int autoCorrect);
 
 typedef enum
 {

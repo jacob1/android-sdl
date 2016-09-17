@@ -540,7 +540,7 @@ unsigned SDL_ANDROID_processTouchscreenKeyboard(int x, int y, int action, int po
 				{
 					pointerInButtonRect[i] = pointerId;
 					if( i == BUTTON_TEXT_INPUT )
-						SDL_ANDROID_ToggleScreenKeyboardTextInput(NULL);
+						SDL_ANDROID_ToggleScreenKeyboardTextInput(NULL, 0);
 					else if( buttonsStayPressedAfterTouch[i] )
 						SDL_ANDROID_MainThreadPushKeyboardKey( SDL_GetKeyboardState(NULL)[buttonKeysyms[i]] == 0 ? SDL_PRESSED : SDL_RELEASED, buttonKeysyms[i], 0 );
 					else
@@ -1270,20 +1270,20 @@ int SDL_ANDROID_GetScreenKeyboardSize(void)
 	return buttonsize;
 };
 
-int SDL_ANDROID_ToggleScreenKeyboardTextInput(const char * previousText)
+int SDL_ANDROID_ToggleScreenKeyboardTextInput(const char * previousText, int autoCorrect)
 {
 	static char textIn[255];
 	if( previousText == NULL )
 		previousText = "";
 	strncpy(textIn, previousText, sizeof(textIn));
 	textIn[sizeof(textIn)-1] = 0;
-	SDL_ANDROID_CallJavaShowScreenKeyboard(textIn, NULL, 0, 0);
+	SDL_ANDROID_CallJavaShowScreenKeyboard(textIn, NULL, 0, 0 autoCorrect);
 	return 1;
 };
 
-int SDLCALL SDL_ANDROID_GetScreenKeyboardTextInput(char * textBuf, int textBufSize)
+int SDLCALL SDL_ANDROID_GetScreenKeyboardTextInput(char * textBuf, int textBufSize, int autoCorrect)
 {
-	SDL_ANDROID_CallJavaShowScreenKeyboard(textBuf, textBuf, textBufSize, 0);
+	SDL_ANDROID_CallJavaShowScreenKeyboard(textBuf, textBuf, textBufSize, 0 autoCorrect);
 	return 1;
 };
 
@@ -1311,7 +1311,7 @@ int SDLCALL SDL_HasScreenKeyboardSupport(void *unused)
 // SDL2 compatibility
 int SDLCALL SDL_ShowScreenKeyboard(void *unused)
 {
-	return SDL_ANDROID_ToggleScreenKeyboardTextInput(NULL);
+	return SDL_ANDROID_ToggleScreenKeyboardTextInput(NULL, 0);
 }
 
 int SDLCALL SDL_HideScreenKeyboard(void *unused)

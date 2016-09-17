@@ -804,7 +804,7 @@ public class MainActivity extends Activity
 		mGLView.nativeScreenKeyboardShown( keyboardWithoutTextInputShown ? 1 : 0 );
 	}
 
-	public void showScreenKeyboard(final String oldText)
+	public void showScreenKeyboard(final String oldText, boolean autoCorrect)
 	{
 		if(Globals.CompatibilityHacksTextInputEmulatesHwKeyboard)
 		{
@@ -901,7 +901,10 @@ public class MainActivity extends Activity
 		_screenKeyboard = screenKeyboard;
 		_videoLayout.addView(_screenKeyboard);
 		//_screenKeyboard.setKeyListener(new TextKeyListener(TextKeyListener.Capitalize.NONE, false));
-		screenKeyboard.setInputType(InputType.TYPE_CLASS_TEXT);
+		if (autoCorrect)
+			screenKeyboard.setInputType(InputType.TYPE_CLASS_TEXT + InputType.TYPE_TEXT_FLAG_AUTO_CORRECT);
+		else
+			screenKeyboard.setInputType(InputType.TYPE_CLASS_TEXT);
 		screenKeyboard.setFocusableInTouchMode(true);
 		screenKeyboard.setFocusable(true);
 		//_inputManager.showSoftInput(screenKeyboard, InputMethodManager.SHOW_IMPLICIT);
