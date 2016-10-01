@@ -88,6 +88,7 @@ static jmethodID JavaRequestCloudSave = NULL;
 static jmethodID JavaRequestCloudLoad = NULL;
 static jmethodID JavaRequestOpenExternalApp = NULL;
 static jmethodID JavaRequestRestartMyself = NULL;
+static jmethodID JavaGetAppName = NULL;
 static jmethodID JavaRequestSetConfigOption = NULL;
 static jmethodID JavaSetSystemMousePointerVisible = NULL;
 static int glContextLost = 0;
@@ -398,6 +399,7 @@ JAVA_EXPORT_NAME(DemoRenderer_nativeInitJavaCallbacks) ( JNIEnv*  env, jobject t
 													"(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)Z");
 	JavaRequestOpenExternalApp = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "openExternalApp", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
 	JavaRequestRestartMyself = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "restartMyself", "(Ljava/lang/String;)V");
+	JavaGetAppName = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "getAppName", "()Ljava/lang/String;");
 	JavaRequestSetConfigOption = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "setConfigOptionFromSDL", "(II)V");
 	JavaSetSystemMousePointerVisible = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "setSystemMousePointerVisible", "(I)V");
 
@@ -648,6 +650,33 @@ void SDLCALL SDL_ANDROID_RestartMyself(const char *restartParams)
 	(*JavaEnv)->CallVoidMethod( JavaEnv, JavaRenderer, JavaRequestRestartMyself, s1 );
 	(*JavaEnv)->DeleteLocalRef(JavaEnv, s1);
 	(*JavaEnv)->PopLocalFrame(JavaEnv, NULL);
+}
+
+char * SDLCALL SDL_ANDROID_GetAppName(void)
+{
+	char *buf = NULL;
+	JNIEnv *JavaEnv = GetJavaEnv();
+	(*JavaEnv)->PushLocalFrame( JavaEnv, 1 );
+	jstring s = (jstring) (*JavaEnv)->CallObjectMethod( JavaEnv, JavaRenderer, JavaGetAppName );
+	if( s )
+	{
+		const char *c = (*JavaEnv)->GetStringUTFChars( JavaEnv, s, NULL );
+		if( c )
+		{
+			int len = strlen(c);
+			buf = SDL_malloc(len + 1);
+			memcpy(buf, c, len + 1);
+			(*JavaEnv)->ReleaseStringUTFChars( JavaEnv, s, c );
+		}
+		(*JavaEnv)->DeleteLocalRef( JavaEnv, s );
+	}
+	(*JavaEnv)->PopLocalFrame( JavaEnv, NULL );
+	if (buf == NULL)
+	{
+		buf = SDL_malloc(1);
+		buf[0] = 0;
+	}
+	return buf;
 }
 
 void SDLCALL SDL_ANDROID_SetConfigOption(int option, int value)

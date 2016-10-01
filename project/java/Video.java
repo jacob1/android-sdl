@@ -988,6 +988,18 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer
 		System.exit(0);
 	}
 
+	public String getAppName()
+	{
+		PackageManager pm = context.getPackageManager();
+		try
+		{
+			String packageName = context.getPackageName();
+			return pm.getApplicationInfo(packageName, 0).publicSourceDir;
+		}
+		catch (Throwable e) {}
+		return null;
+	}
+
 	public void setConfigOptionFromSDL(int option, int value)
 	{
 		Settings.setConfigOptionFromSDL(option, value);
