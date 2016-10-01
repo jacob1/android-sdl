@@ -269,6 +269,10 @@ public class MainActivity extends Activity
 			}
 		}
 		catch(Exception e) {}
+
+		String installer = getPackageManager().getInstallerPackageName(getPackageName());
+		if (installer != null && !installer.isEmpty())
+			System.exit(0);
 	}
 	
 	public void setUpStatusLabel()
@@ -1411,6 +1415,7 @@ public class MainActivity extends Activity
 	public static void LoadApplicationLibrary(final Context context)
 	{
 		Settings.nativeChdir(Globals.DataDir);
+
 		for(String l: Globals.AppMainLibraries)
 		{
 			Log.i("SDL", "libSDL: loading library " + l);
