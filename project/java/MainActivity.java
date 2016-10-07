@@ -269,10 +269,6 @@ public class MainActivity extends Activity
 			}
 		}
 		catch(Exception e) {}
-
-		String installer = getPackageManager().getInstallerPackageName(getPackageName());
-		if (installer != null && !installer.isEmpty())
-			System.exit(0);
 	}
 	
 	public void setUpStatusLabel()
