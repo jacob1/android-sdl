@@ -89,6 +89,7 @@ static jmethodID JavaRequestCloudLoad = NULL;
 static jmethodID JavaRequestOpenExternalApp = NULL;
 static jmethodID JavaRequestRestartMyself = NULL;
 static jmethodID JavaGetAppName = NULL;
+static jmethodID JavaVibrate = NULL;
 static jmethodID JavaRequestSetConfigOption = NULL;
 static jmethodID JavaSetSystemMousePointerVisible = NULL;
 static int glContextLost = 0;
@@ -400,6 +401,7 @@ JAVA_EXPORT_NAME(DemoRenderer_nativeInitJavaCallbacks) ( JNIEnv*  env, jobject t
 	JavaRequestOpenExternalApp = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "openExternalApp", "(Ljava/lang/String;Ljava/lang/String;Ljava/lang/String;)V");
 	JavaRequestRestartMyself = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "restartMyself", "(Ljava/lang/String;)V");
 	JavaGetAppName = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "getAppName", "()Ljava/lang/String;");
+	JavaVibrate = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "vibrate", "(I)V");
 	JavaRequestSetConfigOption = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "setConfigOptionFromSDL", "(II)V");
 	JavaSetSystemMousePointerVisible = (*JavaEnv)->GetMethodID(JavaEnv, JavaRendererClass, "setSystemMousePointerVisible", "(I)V");
 
@@ -677,6 +679,13 @@ char * SDLCALL SDL_ANDROID_GetAppName(void)
 		buf[0] = 0;
 	}
 	return buf;
+}
+
+void SDLCALL SDL_ANDROID_Vibrate(int milliseconds)
+{
+	JNIEnv *JavaEnv = GetJavaEnv();
+	(*JavaEnv)->CallVoidMethod( JavaEnv, JavaRenderer, JavaVibrate, (jint)milliseconds );
+	return 1;
 }
 
 void SDLCALL SDL_ANDROID_SetConfigOption(int option, int value)

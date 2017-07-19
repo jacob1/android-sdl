@@ -42,6 +42,7 @@ import java.nio.ByteOrder;
 import android.os.Bundle;
 import android.os.Build;
 import android.os.Environment;
+import android.os.Vibrator;
 import android.util.DisplayMetrics;
 import android.util.Log;
 import android.content.Context;
@@ -628,6 +629,8 @@ abstract class DifferentTouchInput
 
 class DemoRenderer extends GLSurfaceView_SDL.Renderer
 {
+	Vibrator v;
+
 	public DemoRenderer(MainActivity _context)
 	{
 		context = _context;
@@ -638,8 +641,9 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer
 				nativeClipboardChanged();
 			}
 		});
+		v = (Vibrator) context.getSystemService(Context.VIBRATOR_SERVICE);
 	}
-	
+
 	public void onSurfaceCreated(GL10 gl, EGLConfig config)
 	{
 		Log.i("SDL", "libSDL: DemoRenderer.onSurfaceCreated(): paused " + mPaused + " mFirstTimeStart " + mFirstTimeStart );
@@ -998,6 +1002,12 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer
 		}
 		catch (Throwable e) {}
 		return null;
+	}
+
+	public void vibrate(int milliseconds)
+	{
+		if (v != null)
+			v.vibrate(milliseconds);
 	}
 
 	public void setConfigOptionFromSDL(int option, int value)

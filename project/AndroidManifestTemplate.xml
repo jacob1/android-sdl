@@ -74,7 +74,7 @@
 	<!-- ==ADMOB== --> <uses-permission android:name="android.permission.ACCESS_NETWORK_STATE" />
 	<!-- ==FOREGROUND_SERVICE== --> <uses-permission android:name="android.permission.FOREGROUND_SERVICE" />
 
-	<!-- <uses-permission android:name="android.permission.VIBRATE"></uses-permission> --> <!-- Vibrator not supported yet by SDL -->
+	<uses-permission android:name="android.permission.VIBRATE" />
 
 	<uses-feature android:name="android.hardware.touchscreen" android:required="false" /> <!-- Allow TV boxes -->
 	<uses-feature android:name="android.hardware.faketouch" android:required="false"/> <!-- Allow TV boxes -->
