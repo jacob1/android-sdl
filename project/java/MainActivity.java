@@ -99,6 +99,7 @@ import android.content.pm.PermissionInfo;
 import java.util.Arrays;
 import java.util.zip.ZipFile;
 import java.util.ArrayList;
+import android.net.Uri;
 
 
 public class MainActivity extends Activity
@@ -499,6 +500,9 @@ public class MainActivity extends Activity
 				}, 600 );
 			}
 		});
+
+		Intent intent = getIntent();
+		checkPtsave(intent);
 	}
 
 	@Override
@@ -1191,11 +1195,43 @@ public class MainActivity extends Activity
 	@Override
 	public void onNewIntent(Intent i)
 	{
+		if (checkPtsave(i))
+			return;
 		Log.i("SDL", "onNewIntent(): " + i.toString());
 		super.onNewIntent(i);
 		setIntent(i);
 	}
-	
+
+	private boolean checkPtsave(Intent i)
+	{
+		if (i == null)
+			return false;
+		Uri openUri = i.getData();
+		if (openUri != null)
+		{
+			String scheme = openUri.getScheme();
+			String schemePart = openUri.getSchemeSpecificPart();
+			if (scheme.equals("ptsave") && schemePart != null)
+			{
+				Log.i("SDL", "found ptsave: " + schemePart);
+				if (schemePart.startsWith("ptsave:"))
+					schemePart = schemePart.substring(7);
+				Log.i("SDL", "parsed ptsave: " + schemePart);
+				try
+				{
+					int saveID = Integer.parseInt(schemePart);
+					Settings.nativePtsaveOpen(saveID);
+				}
+				catch (NumberFormatException e)
+				{
+					Log.i("SDL", "got NumberFormatException when parsing ptsave link");
+				}
+				return true;
+			}
+		}
+		return false;
+	}
+
 	public void LoadLibraries()
 	{
 		try

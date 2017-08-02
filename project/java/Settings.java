@@ -1009,4 +1009,5 @@ public class Settings
 	public static native void  nativeSetEnv(final String name, final String value);
 	public static native int   nativeChmod(final String name, int mode);
 	public static native void  nativeChdir(final String dir);
+	public static native void nativePtsaveOpen(int ptsave);
 }

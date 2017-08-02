@@ -1978,3 +1978,19 @@ JAVA_EXPORT_NAME(DemoGLSurfaceView_nativeScreenVisibleRect) (JNIEnv* env, jobjec
 		}
 	}
 }
+
+// I clearly have no idea what i'm doing
+int loadSaveID = 0;
+
+JNIEXPORT void JNICALL
+JAVA_EXPORT_NAME(Settings_nativePtsaveOpen) ( JNIEnv*  env, jclass claz, jint saveID )
+{
+	loadSaveID = saveID;
+}
+
+int SDL_ANDROID_GetPtsaveOpen()
+{
+	int ret = loadSaveID;
+	loadSaveID = 0;
+	return ret;
+}

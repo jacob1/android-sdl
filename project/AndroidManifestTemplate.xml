@@ -39,6 +39,12 @@
 				<!-- ==OPENFILE== --> <data android:pathPattern=".*\\..*\\..*\\.==OPENFILE-EXT==" />
 				<!-- ==OPENFILE== --> <data android:pathPattern=".*\\..*\\..*\\..*\\.==OPENFILE-EXT==" />
 			<!-- ==OPENFILE== --> </intent-filter>
+			<intent-filter>
+				<action android:name="android.intent.action.VIEW" />
+				<category android:name="android.intent.category.DEFAULT" />
+				<category android:name="android.intent.category.BROWSABLE" />
+				<data android:scheme="ptsave" />
+			</intent-filter>
 		</activity>
 		<!-- ==ADMOB== --> <activity android:name="com.google.android.gms.ads.AdActivity" android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|screenLayout|fontScale|uiMode|orientation|screenSize|smallestScreenSize|layoutDirection"/>
 		<!-- ==ADMOB== --> <meta-data android:name="com.google.android.gms.version" android:value="4323000" /> <!-- Change this value to the actual Google Play SDK version -->

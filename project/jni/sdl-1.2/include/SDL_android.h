@@ -134,6 +134,9 @@ extern DECLSPEC char * SDL_ANDROID_GetAppName();
 /* Run vibrator for some number of milliseconds */
 extern DECLSPEC void SDL_ANDROID_Vibrate(int milliseconds);
 
+/* Hack to check for ptsave:// urls because I have no idea what i'm doing */
+extern DECLSPEC int SDLCALL SDL_ANDROID_GetPtsaveOpen();
+
 enum {
 	SDL_ANDROID_CONFIG_VIDEO_DEPTH_BPP = 0, /* Can be 16 or 24 for software video modes, OpenGL supports 16/24/32 */
 	/* TODO: more options, see Globals.java */

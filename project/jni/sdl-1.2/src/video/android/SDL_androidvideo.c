@@ -685,7 +685,6 @@ void SDLCALL SDL_ANDROID_Vibrate(int milliseconds)
 {
 	JNIEnv *JavaEnv = GetJavaEnv();
 	(*JavaEnv)->CallVoidMethod( JavaEnv, JavaRenderer, JavaVibrate, (jint)milliseconds );
-	return 1;
 }
 
 void SDLCALL SDL_ANDROID_SetConfigOption(int option, int value)
