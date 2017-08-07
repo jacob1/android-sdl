@@ -5,7 +5,7 @@ include $(CLEAR_VARS)
 LOCAL_MODULE := lua52
 
 LOCAL_C_INCLUDES := $(LOCAL_PATH)/src $(LOCAL_PATH)/include 
-LOCAL_CFLAGS	:= -D"getlocaledecpoint()='.'" -DLUA_COMPAT_ALL
+LOCAL_CFLAGS	:= -D"getlocaledecpoint()='.'" -DLUA_COMPAT_ALL -DLUA_USE_LINUX
 #LOCAL_CFLAGS := -O3 -Wall -DLUA_COMPAT_ALL
 
 LOCAL_CPP_EXTENSION := .cpp
