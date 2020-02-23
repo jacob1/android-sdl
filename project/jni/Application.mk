@@ -5,7 +5,7 @@ include jni/Settings.mk
 ifneq ($(filter c++_shared, $(APP_MODULES)),)
 APP_STL := c++_shared
 else
-APP_STL := none
+APP_STL := c++_static
 endif
 APP_CFLAGS := -g
 ifneq ($(NDK_DEBUG),1)
