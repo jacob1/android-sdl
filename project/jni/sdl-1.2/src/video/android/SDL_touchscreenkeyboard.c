@@ -1277,13 +1277,13 @@ int SDL_ANDROID_ToggleScreenKeyboardTextInput(const char * previousText, int aut
 		previousText = "";
 	strncpy(textIn, previousText, sizeof(textIn));
 	textIn[sizeof(textIn)-1] = 0;
-	SDL_ANDROID_CallJavaShowScreenKeyboard(textIn, NULL, 0, 0 autoCorrect);
+	SDL_ANDROID_CallJavaShowScreenKeyboard(textIn, NULL, 0, 0, autoCorrect);
 	return 1;
 };
 
 int SDLCALL SDL_ANDROID_GetScreenKeyboardTextInput(char * textBuf, int textBufSize, int autoCorrect)
 {
-	SDL_ANDROID_CallJavaShowScreenKeyboard(textBuf, textBuf, textBufSize, 0 autoCorrect);
+	SDL_ANDROID_CallJavaShowScreenKeyboard(textBuf, textBuf, textBufSize, 0, autoCorrect);
 	return 1;
 };
 
@@ -1298,7 +1298,7 @@ SDL_AndroidTextInputAsyncStatus_t SDLCALL SDL_ANDROID_GetScreenKeyboardTextInput
 	if( !SDL_ANDROID_IsScreenKeyboardShownFlag )
 	{
 		SDL_ANDROID_AsyncTextInputActive = 1;
-		SDL_ANDROID_CallJavaShowScreenKeyboard(textBuf, textBuf, textBufSize, 1);
+		SDL_ANDROID_CallJavaShowScreenKeyboard(textBuf, textBuf, textBufSize, 1, 0);
 	}
 	return SDL_ANDROID_TEXTINPUT_ASYNC_IN_PROGRESS;
 }
