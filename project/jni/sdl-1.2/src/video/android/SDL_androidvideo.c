@@ -201,13 +201,20 @@ JAVA_EXPORT_NAME(DemoRenderer_nativeResize) ( JNIEnv*  env, jobject  thiz, jint 
 	SDL_ANDROID_sWindowWidth = w;
 	SDL_ANDROID_sWindowHeight = h;
 	SDL_ANDROID_ScreenKeep43Ratio = keepRatio;
+	recalculateTouchscreenCalibration();
+	__android_log_print(ANDROID_LOG_INFO, "libSDL", "Physical screen resolution is %dx%d 43Ratio %d", w, h, keepRatio);
+}
+
+void recalculateTouchscreenCalibration()
+{
 	if( SDL_ANDROID_ScreenKeep43Ratio )
 		SDL_ANDROID_sWindowWidth = (SDL_ANDROID_sFakeWindowWidth * SDL_ANDROID_sRealWindowHeight) / SDL_ANDROID_sFakeWindowHeight;
 
 	SDL_ANDROID_TouchscreenCalibrationWidth = SDL_ANDROID_sWindowWidth;
 	SDL_ANDROID_TouchscreenCalibrationHeight = SDL_ANDROID_sWindowHeight;
-
-	__android_log_print(ANDROID_LOG_INFO, "libSDL", "Physical screen resolution is %dx%d 43Ratio %d", w, h, keepRatio);
+	__android_log_print(ANDROID_LOG_INFO, "libSDL", "Touchscreen fake resolution is %dx%d 43Ratio %d",
+			SDL_ANDROID_TouchscreenCalibrationWidth, SDL_ANDROID_TouchscreenCalibrationHeight,
+			SDL_ANDROID_ScreenKeep43Ratio);
 }
 
 JNIEXPORT void JNICALL 

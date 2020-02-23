@@ -101,4 +101,6 @@ extern int SDL_ANDROID_joysticksAmount;
 extern void SDL_ANDROID_PumpEvents();
 extern void SDL_ANDROID_SetHoverDeadzone();
 
+extern void recalculateTouchscreenCalibration(); // Added - jacob1
+
 #endif /* _SDL_androidvideo_h */
