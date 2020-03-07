@@ -415,7 +415,7 @@ SDL_Surface *ANDROID_SetVideoMode(_THIS, SDL_Surface *current,
 
 	SDL_ANDROID_sFakeWindowWidth = width;
 	SDL_ANDROID_sFakeWindowHeight = height;
-	recalculateTouchscreenCalibration(); // Now that we have the proper video size, recalculate touchscreen calibration
+	//recalculateTouchscreenCalibration(); // Now that we have the proper video size, recalculate touchscreen calibration
 
 	current->flags = (flags & SDL_FULLSCREEN) | (flags & SDL_OPENGL) | SDL_DOUBLEBUF | (flags & SDL_HWSURFACE);
 	current->w = width;
@@ -448,7 +448,7 @@ SDL_Surface *ANDROID_SetVideoMode(_THIS, SDL_Surface *current,
 				// and expects those 256 pixels to stretch 2x height like on a TV interlaced display.
 				SDL_ANDROID_sWindowWidth = SDL_ANDROID_sWindowHeight * 4 / 3;
 
-			//SDL_ANDROID_TouchscreenCalibrationWidth = SDL_ANDROID_sWindowWidth;
+			SDL_ANDROID_TouchscreenCalibrationWidth = SDL_ANDROID_sWindowWidth;
 			SDL_ANDROID_ForceClearScreenRectAmount = 2;
 		}
 

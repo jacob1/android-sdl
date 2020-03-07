@@ -207,8 +207,8 @@ JAVA_EXPORT_NAME(DemoRenderer_nativeResize) ( JNIEnv*  env, jobject  thiz, jint 
 
 void recalculateTouchscreenCalibration()
 {
-	if( SDL_ANDROID_ScreenKeep43Ratio )
-		SDL_ANDROID_sWindowWidth = (SDL_ANDROID_sFakeWindowWidth * SDL_ANDROID_sRealWindowHeight) / SDL_ANDROID_sFakeWindowHeight;
+	//if( SDL_ANDROID_ScreenKeep43Ratio )
+	//	SDL_ANDROID_sWindowWidth = (SDL_ANDROID_sFakeWindowWidth * SDL_ANDROID_sRealWindowHeight) / SDL_ANDROID_sFakeWindowHeight;
 
 	SDL_ANDROID_TouchscreenCalibrationWidth = SDL_ANDROID_sWindowWidth;
 	SDL_ANDROID_TouchscreenCalibrationHeight = SDL_ANDROID_sWindowHeight;
