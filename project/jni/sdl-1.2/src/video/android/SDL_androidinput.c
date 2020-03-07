@@ -304,7 +304,7 @@ static void ClearOldTouchPointers( int action, int pointerId )
 		}
 	}
 }
-
+//#include <android/log.h>
 static void AdjustTouchScreenCalibration( jint *xx, jint *yy )
 {
 	int x = *xx, y = *yy;
@@ -325,7 +325,10 @@ static void AdjustTouchScreenCalibration( jint *xx, jint *yy )
 		y = 0;
 	if( y > SDL_ANDROID_sFakeWindowHeight )
 		y = SDL_ANDROID_sFakeWindowHeight;
-	
+	/*__android_log_print(ANDROID_LOG_INFO, "libSDL", "calibration test - real %dx%d, fake %dx%d, window %dx%d, touchscreen %dx%d", SDL_ANDROID_sRealWindowWidth,
+			SDL_ANDROID_sRealWindowHeight, SDL_ANDROID_sFakeWindowWidth, SDL_ANDROID_sFakeWindowHeight,
+			SDL_ANDROID_sWindowWidth, SDL_ANDROID_sWindowHeight, SDL_ANDROID_TouchscreenCalibrationWidth,
+			SDL_ANDROID_TouchscreenCalibrationHeight);*/
 #else
 	x = x * SDL_ANDROID_sRealWindowWidth / SDL_ANDROID_TouchscreenCalibrationWidth;
 	y = y * SDL_ANDROID_sRealWindowHeight / SDL_ANDROID_TouchscreenCalibrationHeight;

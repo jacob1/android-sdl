@@ -668,9 +668,9 @@ class DemoRenderer extends GLSurfaceView_SDL.Renderer
 		mHeight = h - h % 2;
 		mGl = gl;
 		nativeResize(mWidth, mHeight, Globals.KeepAspectRatio ? 1 : 0);
-		//if( Globals.TouchscreenCalibration[2] > Globals.TouchscreenCalibration[0] )
-		//	Settings.nativeSetTouchscreenCalibration(Globals.TouchscreenCalibration[0], Globals.TouchscreenCalibration[1],
-		//		Globals.TouchscreenCalibration[2], Globals.TouchscreenCalibration[3]);
+		if( Globals.TouchscreenCalibration[2] > Globals.TouchscreenCalibration[0] )
+			Settings.nativeSetTouchscreenCalibration(Globals.TouchscreenCalibration[0], Globals.TouchscreenCalibration[1],
+				Globals.TouchscreenCalibration[2], Globals.TouchscreenCalibration[3]);
 	}
 
 	int mLastPendingResize = 0;
