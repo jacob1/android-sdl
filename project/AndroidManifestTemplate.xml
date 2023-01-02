@@ -18,6 +18,7 @@
 				  android:launchMode="singleTask"
 				  android:configChanges="mcc|mnc|locale|touchscreen|keyboard|keyboardHidden|navigation|screenLayout|fontScale|uiMode|orientation|screenSize|smallestScreenSize|layoutDirection"
 				  android:windowSoftInputMode="stateUnspecified"
+				  android:exported="true"
 		>
 			<intent-filter>
 				<action android:name="android.intent.action.MAIN" />
@@ -67,7 +68,7 @@
 	</application>
 
 	<!-- Must match version numbers in project/app/build-template.gradle -->
-	<uses-sdk android:minSdkVersion="16" android:targetSdkVersion="29" />
+	<uses-sdk android:minSdkVersion="16" android:targetSdkVersion="33" />
 
 	<!-- ==INTERNET== --> <uses-permission android:name="android.permission.INTERNET" />
 	<!-- ==EXTERNAL_STORAGE== --> <uses-permission android:name="android.permission.WRITE_EXTERNAL_STORAGE" />
