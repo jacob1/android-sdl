@@ -1,0 +1,23 @@
+41a42
+>             my $ndkbin = undef;
+46c47
+<                     if (m|Pkg\.Revision\s*=\s*([0-9]+)|) {
+---
+>                     if (m|^Pkg\.Revision\s*=\s*([0-9]+)|) {
+51a53,57
+>                 die "$ndk/source.properties is missing or corrupt!" if (!$ndkver);
+>                 if ($ndkver >= 19) {
+>                     $ndkbin = "$ndk/toolchains/llvm/prebuilt/linux-x86_64/bin";
+>                     $ENV{'PATH'} = "$ndkbin:$ENV{'PATH'}";
+>                 }
+91,92c97,103
+<             # see if there is NDK clang on $PATH, "universal" or "standalone"
+<             if (which("clang") =~ m|^$ndk/.*/prebuilt/([^/]+)/|) {
+---
+>             if (which("$triarch$api-clang") =~ m|^$ndk/.*/prebuilt/([^/]+)/|) {
+>                 my $ndkbinbase = "$ndkbin/$triarch";
+>                 $user{AR} = "$ndkbinbase-ar";
+>                 $user{CC} = "$ndkbinbase$api-clang";
+>                 $user{CXX} = "$ndkbinbase$api-clang++";
+>                 $user{RANLIB} = "$ndkbinbase-ranlib";
+>             } elsif (which("clang") =~ m|^$ndk/.*/prebuilt/([^/]+)/|) { # see if there is NDK clang on $PATH, "universal" or "standalone"
