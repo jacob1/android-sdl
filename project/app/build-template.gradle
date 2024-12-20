@@ -1,12 +1,14 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 33
+    compileSdkVersion 35
+
+    namespace "uk.co.powdertoy.debug"
 
     defaultConfig {
         applicationId "net.olofson.ballfield"
         minSdkVersion 16 // Must match version numbers in project/AndroidManifestTemplate.xml
-        targetSdkVersion 33
+        targetSdkVersion 35
     }
 
     buildTypes {
