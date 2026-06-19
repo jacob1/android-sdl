@@ -3,34 +3,56 @@
 ARCHITECTURE=$1
 shift 1
 
+
+echo_usage()
+{
+	printf "
+\033[1mInstructions for use:\033[m
+
+  First, edit this script and change the variables at the start to
+  match your ndk installation. Then use these commands to download,
+  compile, and install libraries:
+
+    \033[1m"${0}"\033[m \033[4mPLATFORM\033[m make \033[4mLIBRARY_NAME\033[m...
+    \033[1msudo "${0}"\033[m \033[4mPLATFORM\033[m install \033[4mLIBRARY_NAME\033[m...
+
+  VALID PLATFORMs are: \033[1mx86_64 x86 arm64-v8a armeabi-v7a\033[m
+  Valid LIBRARY_NAMEs are: \033[1mzlib openssl (not preferred) boringssl nghttp2 curl\033[m
+\n"
+}
+
 case $ARCHITECTURE in
 	x86_64)
 		HOSTPREFIX="x86_64-linux-android"
 		COMPILERPREFIX=$HOSTPREFIX
 		VER="21"
 		OPENSSL_ARCH="android-x86_64"
+		LUAJIT_HOSTCC="gcc"
 		;;
 	x86)
 		HOSTPREFIX="i686-linux-android"
 		COMPILERPREFIX=$HOSTPREFIX
-		VER="16"
+		VER="21"
 		OPENSSL_ARCH="android-x86"
+		LUAJIT_HOSTCC="gcc -m32"
 		;;
 	arm64-v8a)
 		HOSTPREFIX="aarch64-linux-android"
 		COMPILERPREFIX=$HOSTPREFIX
 		VER="21"
 		OPENSSL_ARCH="android-arm64"
+		LUAJIT_HOSTCC="gcc"
 		;;
 	armeabi-v7a)
 		# HOSTPREFIX and #COMPILEPREFIX are different for this arch in the ndk for some awful reason
 		HOSTPREFIX="arm-linux-androideabi"
 		COMPILERPREFIX="armv7a-linux-androideabi"
-		VER="16"
+		VER="21"
 		OPENSSL_ARCH="android-arm"
+		LUAJIT_HOSTCC="gcc -m32"
 		;;
 	*)
-		echo "invalid arch"
+		echo_usage
 		exit 1
 	;;
 esac
@@ -39,7 +61,8 @@ esac
 HOST="$HOSTPREFIX$VER"
 # prefix for ndk executables. Clang executables are prefixed with sdk version, and the rest are not
 CLANG_BIN_PREFIX="$HOSTPREFIX$VER-"
-CLANG_BIN_PREFIX_NOVER="$HOSTPREFIX-"
+#CLANG_BIN_PREFIX_NOVER="$HOSTPREFIX-"
+CLANG_BIN_PREFIX_NOVER="llvm-"
 # where to install the libraries
 CLANG_INSTALL_DIR="/home/jacob/code/android/ndk-cross-libs/$ARCHITECTURE"
 #CLANG_INSTALL_DIR="/home/jacob/code/android/android-ndk-r21/toolchains/llvm/prebuilt/linux-x86_64/sysroot/usr/lib"
@@ -82,12 +105,17 @@ CLANG_INSTALL_DIR="/home/jacob/code/android/ndk-cross-libs/$ARCHITECTURE"
 #
 
 export AR=${CLANG_BIN_PREFIX_NOVER}ar
-export CC=${COMPILERPREFIX}${VER}-clang
-export CXX=${COMPILERPREFIX}${VER}-clang++
+#export CC=${COMPILERPREFIX}${VER}-clang
+#export CXX=${COMPILERPREFIX}${VER}-clang++
+export CC="clang -target ${COMPILERPREFIX}${VER}"
+export CXX="clang++ -target ${COMPILERPREFIX}${VER}"
 export RANLIB=${CLANG_BIN_PREFIX_NOVER}ranlib
 export STRIP=${CLANG_BIN_PREFIX_NOVER}strip
 export PREFIX=${CLANG_INSTALL_DIR}
 MAKE="make -j 16"
+
+# 16 KB page sizes. Applies to some libs and not all, but I just used ndk 28+ instead which automatically does it
+export LDFLAGS="-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384"
 
 log_error()
 {
@@ -192,23 +220,23 @@ zlib_install()
 	return $result
 }
 
-openssl_url="https://www.openssl.org/source/openssl-1.1.1d.tar.gz"
-openssl_md5="3be209000dbc7e1b95bcdf47980a3baa"
-openssl_filename="openssl-1.1.1d.tar.gz"
-openssl_folder="/openssl-1.1.1d"
+openssl_url="https://github.com/openssl/openssl/releases/download/openssl-3.6.3/openssl-3.6.3.tar.gz"
+openssl_md5="f388d6144fe20b9b2c6bf208280d6ec3"
+openssl_filename="openssl-3.6.3.tar.gz"
+openssl_folder="/openssl-3.6.3"
 openssl_extractfolder="tpt-libs/$ARCHITECTURE"
 openssl_compile()
 {
 	# This patch taken from eighthave's comment on https://github.com/openssl/openssl/pull/8992  (actual PR has syntax errors)
-	patch $1/Configurations/15-android.conf android-ndk.patch 
+	#patch $1/Configurations/15-android.conf android-ndk.patch
 	pushd $1 > /dev/null
 	# Does not work, tries using linux x86_64 stuff. Need to specifically call ./Configure with android platform
 	#./config shared no-ssl2 no-ssl3 no-comp no-hw no-engine --prefix=$CLANG_INSTALL_DIR --openssldir=$CLANG_INSTALL_DIR/ssl && $MAKE
 	
 	# Special notes on some args:
-	# -D__ANDROID_API__=$VER is required or else you get linker errors for random stuff like stdin: https://github.com/android/ndk/issues/445
+	# -D__ANDROID_API__=$VER is required or else you get linker errors for random stuff like stdin: https://github.com/android/ndk/issues/445  (removed it after updating to 1.1.1w because it seems unnecessary now)
 	# zlib must be installed first. Unsure if openssl really needs zlib support though, curl has it
-	./Configure $OPENSSL_ARCH no-shared no-ssl2 no-ssl3 no-hw no-engine no-stdio --with-zlib-include=$CLANG_INSTALL_DIR/include --with-zlib-lib=$CLANG_INSTALL_DIR/lib --openssldir=$CLANG_INSTALL_DIR/ssl --prefix=$CLANG_INSTALL_DIR -D__ANDROID_API__=$VER && $MAKE
+	./Configure $OPENSSL_ARCH no-shared no-ssl2 no-ssl3 no-hw no-engine no-stdio --with-zlib-include=$CLANG_INSTALL_DIR/include --with-zlib-lib=$CLANG_INSTALL_DIR/lib --openssldir=$CLANG_INSTALL_DIR/ssl --prefix=$CLANG_INSTALL_DIR && $MAKE
 	result=$?
 	popd > /dev/null
 	return $result
@@ -222,17 +250,16 @@ openssl_install()
 	return $result
 }
 
-#boringssl_url="https://starcatcher.us/TPT/libs/boringssl.zip"
-#boringssl_md5="d69f6d7bde4db9e76b3eb59dd28d5344"
-boringssl_url="https://github.com/google/boringssl/archive/refs/heads/master.zip"
-boringssl_md5="d69f6d7bde4db9e76b3eb59dd28d5344"
-boringssl_filename="boringssl.zip"
-boringssl_folder="/boringssl"
+boringssl_url="https://github.com/google/boringssl/releases/download/0.20240930.0/boringssl-0.20240930.0.tar.gz"
+boringssl_md5="42997d6f9271ef32c073e27684923c7e"
+boringssl_filename="boringssl.tar.gz"
+boringssl_folder="/boringssl-0.20240930.0"
 boringssl_extractfolder="tpt-libs/$ARCHITECTURE"
 boringssl_compile()
 {
 	pushd $1 > /dev/null
 	cmake -DANDROID_ABI=$ARCHITECTURE -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake \
+			  -DANDROID_PLATFORM=android-${VER} \
               -DANDROID_NATIVE_API_LEVEL=$MIN_SDK_VERSION \
               -DCMAKE_BUILD_TYPE=Release . && $MAKE
 	result=$?
@@ -243,25 +270,45 @@ boringssl_install()
 {
 	pushd $1 > /dev/null
 	mkdir -p $CLANG_INSTALL_DIR/lib
-	cp ssl/libssl.a $CLANG_INSTALL_DIR/lib && cp crypto/libcrypto.a $CLANG_INSTALL_DIR/lib && cp -r include $CLANG_INSTALL_DIR
+	cp libssl.a $CLANG_INSTALL_DIR/lib && cp libcrypto.a $CLANG_INSTALL_DIR/lib && cp -r include $CLANG_INSTALL_DIR
 	result=$?
 	popd > /dev/null
 	return $result
 }
-curl_url="https://curl.se/download/curl-7.79.1.tar.gz"
-curl_md5="2840cca526ec80353fa334d28d7aa581"
-curl_filename="curl-7.79.1.tar.gz"
-curl_folder="/curl-7.79.1"
-#curl_url="https://curl.se/download/curl-7.68.0.tar.gz"
-#curl_md5="f68d6f716ff06d357f476ea4ea57a3d6"
-#curl_filename="curl-7.68.0.tar.gz"
-#curl_folder="/curl-7.68.0"
+
+nghttp2_url="https://github.com/nghttp2/nghttp2/releases/download/v1.69.0/nghttp2-1.69.0.tar.gz"
+nghttp2_md5="1a4709ee5202a92d3d3e7557d88531fa"
+nghttp2_filename="nghttp2-1.69.0.tar.gz"
+nghttp2_folder="/nghttp2-1.69.0"
+nghttp2_extractfolder="tpt-libs/$ARCHITECTURE"
+nghttp2_compile()
+{
+	pushd $1 > /dev/null
+	./configure --host=$HOST --prefix=$CLANG_INSTALL_DIR --without-systemd --without-openssl --with-pic && $MAKE
+	result=$?
+	popd > /dev/null
+	return $result
+}
+nghttp2_install()
+{
+	pushd $1 > /dev/null
+	$MAKE install
+	result=$?
+	popd > /dev/null
+	return $result
+}
+
+curl_url="https://curl.se/download/curl-8.20.0.tar.gz"
+curl_md5="4f3a732b55b58a7c223f313510ca27c9"
+curl_filename="curl-8.20.0.tar.gz"
+curl_folder="/curl-8.20.0"
 curl_extractfolder="tpt-libs/$ARCHITECTURE"
 curl_compile()
 {
 	pushd $1 > /dev/null
-	CPPFLAGS="-I$CLANG_INSTALL_DIR/include" LDFLAGS="-L$CLANG_INSTALL_DIR/lib" ./configure --host=$HOST --prefix=$CLANG_INSTALL_DIR --with-zlib --with-ssl --enable-ipv6 --disable-ftp --disable-telnet --disable-smtp --disable-imap --disable-pop3 --disable-smb --disable-gopher --disable-dict --disable-file --disable-tftp --disable-rtsp --disable-ldap --with-ca-fallback --with-ca-path=/system/etc/security/cacerts && \
+	CPPFLAGS="-I$CLANG_INSTALL_DIR/include -fexceptions" LDFLAGS="-L$CLANG_INSTALL_DIR/lib -lstdc++ ${LDFLAGS}" ./configure --host=$HOST --prefix=$CLANG_INSTALL_DIR --with-zlib --with-ssl=${CLANG_INSTALL_DIR} --enable-ipv6 --disable-ftp --disable-telnet --disable-smtp --disable-imap --disable-pop3 --disable-smb --disable-gopher --disable-dict --disable-file --disable-tftp --disable-rtsp --disable-ldap --without-libpsl --with-ca-fallback --with-ca-path=/system/etc/security/cacerts && \
 	$MAKE
+	# --with-ca-path=/system/etc/security/cacerts
 	result=$?
 	popd > /dev/null
 	return $result
@@ -275,21 +322,26 @@ curl_install()
 	return $result
 }
 
-
-echo_usage()
+luajit_url="https://github.com/The-Powder-Toy/tpt-libs/raw/refs/heads/master/tarballs/LuaJIT-2.1.0-git.tar.gz"
+luajit_md5="38acd902a6359b97a4b1cfab8186323b"
+luajit_filename="LuaJIT-2.1.0-git.tar.gz"
+luajit_folder="/LuaJIT-2.1.0-git"
+luajit_extractfolder="tpt-libs/$ARCHITECTURE"
+luajit_compile()
 {
-	printf "
-\033[1mInstructions for use:\033[m
-
-  First, edit this script and change the variables at the start to
-  match your MinGW installation. Then use these commands to download,
-  compile, and install libraries:
-  
-    \033[1m"${0}"\033[m make \033[4mLIBRARY_NAME\033[m...
-    \033[1msudo "${0}"\033[m install \033[4mLIBRARY_NAME\033[m...
-    
-  Valid LIBRARY_NAMEs are: \033[1mzlib openssl curl\033[m
-\n"
+	pushd $1 > /dev/null
+	$MAKE TARGET_SYS=Linux HOST_CC="${LUAJIT_HOSTCC}" CC="${CC}" STATIC_CC="${CC}" DYNAMIC_CC="${CC} -fPIC" TARGET_LD="${CC}" CROSS="${CLANG_BIN_PREFIX}" TARGET_AR="${AR} rcus" TARGET_STRIP="${STRIP}" RANLIB="${RANLIB}"
+	result=$?
+	popd > /dev/null
+	return $result
+}
+luajit_install()
+{
+	pushd $1 > /dev/null
+	$MAKE install TARGET_SYS=Linux HOST_CC="${LUAJIT_HOSTCC}" CC="${CC}" CROSS="${CLANG_BIN_PREFIX}" PREFIX=${PREFIX}
+	result=$?
+	popd > /dev/null
+	return $result
 }
 
 
