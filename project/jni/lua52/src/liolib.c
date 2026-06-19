@@ -88,8 +88,8 @@
 
 #if defined(LUA_USE_POSIX)	/* { */
 
-#define l_fseek(f,o,w)		fseeko(f,o,w)
-#define l_ftell(f)		ftello(f)
+#define l_fseek(f,o,w)		fseek(f,(long)o,w)
+#define l_ftell(f)		(int64_t)ftell(f)
 #define l_seeknum		off_t
 
 #elif defined(LUA_WIN) && !defined(_CRTIMP_TYPEINFO) \
