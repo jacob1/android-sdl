@@ -5,7 +5,7 @@
 #                            | (__| |_| |  _ <| |___
 #                             \___|\___/|_| \_\_____|
 #
-# Copyright (C) 1998 - 2020, Daniel Stenberg, <daniel@haxx.se>, et al.
+# Copyright (C) Daniel Stenberg, <daniel@haxx.se>, et al.
 #
 # This software is licensed as described in the file COPYING, which
 # you should have received as part of this distribution. The terms
@@ -18,22 +18,24 @@
 # This software is distributed on an "AS IS" basis, WITHOUT WARRANTY OF ANY
 # KIND, either express or implied.
 #
+# SPDX-License-Identifier: curl
+#
 ###########################################################################
 
-# This should most probably benefit from getting a "Requires:" field added
-# dynamically by configure.
-#
 prefix=/home/jacob/code/android/ndk-cross-libs/arm64-v8a
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
-supported_protocols="HTTP HTTPS MQTT"
-supported_features="AsynchDNS HSTS HTTPS-proxy IPv6 Largefile NTLM NTLM_WB SSL UnixSockets alt-svc libz"
+supported_protocols="HTTP HTTPS IPFS IPNS MQTT MQTTS WS WSS"
+supported_features="alt-svc AsynchDNS HSTS HTTP2 HTTPS-proxy IPv6 Largefile libz SSL threadsafe UnixSockets"
 
 Name: libcurl
 URL: https://curl.se/
-Description: Library to transfer files with ftp, http, etc.
-Version: 7.79.1
+Description: Library to transfer files with HTTP, FTP, etc.
+Version: 8.20.0
+Requires: 
+Requires.private: zlib,libnghttp2
 Libs: -L${libdir} -lcurl 
-Libs.private: -lssl -lcrypto -lssl -lcrypto -lz
+Libs.private: -L/home/jacob/code/android/ndk-cross-libs/arm64-v8a/lib -L/home/jacob/code/android/ndk-cross-libs/arm64-v8a/lib -lnghttp2 -lssl -lcrypto -lz
 Cflags: -I${includedir} 
+Cflags.private: -DCURL_STATICLIB
