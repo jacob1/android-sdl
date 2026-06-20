@@ -1,0 +1,1 @@
+../../../ndk-cross-libs/x86_64/include/fftw3q.f03

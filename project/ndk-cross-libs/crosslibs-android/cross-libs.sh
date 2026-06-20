@@ -17,7 +17,7 @@ echo_usage()
     \033[1msudo "${0}"\033[m \033[4mPLATFORM\033[m install \033[4mLIBRARY_NAME\033[m...
 
   VALID PLATFORMs are: \033[1mx86_64 x86 arm64-v8a armeabi-v7a\033[m
-  Valid LIBRARY_NAMEs are: \033[1mzlib openssl (not preferred) boringssl nghttp2 curl\033[m
+  Valid LIBRARY_NAMEs are: \033[1mzlib openssl (not preferred) boringssl nghttp2 curl luajit fftw\033[m
 \n"
 }
 
@@ -339,6 +339,29 @@ luajit_install()
 {
 	pushd $1 > /dev/null
 	$MAKE install TARGET_SYS=Linux HOST_CC="${LUAJIT_HOSTCC}" CC="${CC}" CROSS="${CLANG_BIN_PREFIX}" PREFIX=${PREFIX}
+	result=$?
+	popd > /dev/null
+	return $result
+}
+
+fftw_url="https://www.fftw.org/fftw-3.3.11.tar.gz"
+fftw_md5="40ec8d0447d03b8f01f8c90aa77bd16f"
+fftw_filename="fftw-3.3.11.tar.gz"
+fftw_folder="/fftw-3.3.11"
+fftw_extractfolder="tpt-libs/$ARCHITECTURE"
+fftw_compile()
+{
+	pushd $1 > /dev/null
+	./configure --host=$HOST --prefix=$CLANG_INSTALL_DIR --enable-shared --enable-static --disable-alloca --with-our-malloc16 --disable-threads --disable-fortran --enable-portable-binary --enable-float && \
+	$MAKE
+	result=$?
+	popd > /dev/null
+	return $result
+}
+fftw_install()
+{
+	pushd $1 > /dev/null
+	$MAKE install
 	result=$?
 	popd > /dev/null
 	return $result
