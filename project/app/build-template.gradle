@@ -24,5 +24,6 @@ android {
 
     dependencies { compile 'com.google.android.gms:play-services-games:11.4.0' } // ==GOOGLEPLAYGAMESERVICES==
     dependencies { compile 'com.google.android.gms:play-services-drive:11.4.0' } // ==GOOGLEPLAYGAMESERVICES==
+    dependencies { implementation 'androidx.core:core:1.12.0' }
 }
 
