@@ -26,15 +26,15 @@ prefix=/home/jacob/code/android/ndk-cross-libs/x86
 exec_prefix=${prefix}
 libdir=${exec_prefix}/lib
 includedir=${prefix}/include
-supported_protocols="HTTP HTTPS IPFS IPNS MQTT MQTTS WS WSS"
-supported_features="alt-svc AsynchDNS HSTS HTTP2 HTTPS-proxy IPv6 Largefile libz SSL threadsafe UnixSockets"
+supported_protocols="HTTP HTTPS IPFS IPNS MQTT WS WSS"
+supported_features="alt-svc AsynchDNS HSTS HTTP2 HTTPS-proxy IPv6 Largefile libz NTLM SSL threadsafe UnixSockets"
 
 Name: libcurl
 URL: https://curl.se/
 Description: Library to transfer files with HTTP, FTP, etc.
-Version: 8.20.0
+Version: 8.17.0
 Requires: 
-Requires.private: zlib,libnghttp2
+Requires.private: zlib,openssl,libnghttp2
 Libs: -L${libdir} -lcurl 
 Libs.private: -L/home/jacob/code/android/ndk-cross-libs/x86/lib -L/home/jacob/code/android/ndk-cross-libs/x86/lib -lnghttp2 -lssl -lcrypto -lz
 Cflags: -I${includedir} 

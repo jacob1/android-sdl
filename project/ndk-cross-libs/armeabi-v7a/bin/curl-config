@@ -82,20 +82,20 @@ while test "$#" -gt 0; do
     ;;
 
   --feature|--features)
-    for feature in alt-svc AsynchDNS HSTS HTTP2 HTTPS-proxy IPv6 Largefile libz SSL threadsafe UnixSockets ''; do
+    for feature in alt-svc AsynchDNS HSTS HTTP2 HTTPS-proxy IPv6 Largefile libz NTLM SSL threadsafe UnixSockets ''; do
       test -n "$feature" && echo "$feature"
     done
     ;;
 
   --protocols)
     # shellcheck disable=SC2043
-    for protocol in HTTP HTTPS IPFS IPNS MQTT MQTTS WS WSS; do
+    for protocol in HTTP HTTPS IPFS IPNS MQTT WS WSS; do
       echo "$protocol"
     done
     ;;
 
   --version)
-    echo 'libcurl 8.20.0'
+    echo 'libcurl 8.17.0'
     exit 0
     ;;
 
@@ -107,11 +107,11 @@ while test "$#" -gt 0; do
     # dash as that's used for things like version 1.2.3-pre1
     cpatch=`echo "$checkfor" | cut -d. -f3 | cut -d- -f1`
 
-    vmajor=`echo '8.20.0' | cut -d. -f1`
-    vminor=`echo '8.20.0' | cut -d. -f2`
+    vmajor=`echo '8.17.0' | cut -d. -f1`
+    vminor=`echo '8.17.0' | cut -d. -f2`
     # when extracting the patch part we strip off everything after a
     # dash as that's used for things like version 1.2.3-pre1
-    vpatch=`echo '8.20.0' | cut -d. -f3 | cut -d- -f1`
+    vpatch=`echo '8.17.0' | cut -d. -f3 | cut -d- -f1`
 
     if test "$vmajor" -gt "$cmajor"; then
       exit 0
@@ -127,12 +127,12 @@ while test "$#" -gt 0; do
       fi
     fi
 
-    echo "requested version $checkfor is newer than existing 8.20.0"
+    echo "requested version $checkfor is newer than existing 8.17.0"
     exit 1
     ;;
 
   --vernum)
-    echo '081400'
+    echo '081100'
     exit 0
     ;;
 
@@ -149,7 +149,7 @@ while test "$#" -gt 0; do
     ;;
 
   --libs)
-    if test "${exec_prefix}/lib" != '/usr/lib' && test "${exec_prefix}/lib" != '/usr/lib64'; then
+    if test "${exec_prefix}/lib" != '/usr/lib' -a "${exec_prefix}/lib" != '/usr/lib64'; then
       curllibdir="-L${exec_prefix}/lib "
     else
       curllibdir=''
@@ -175,7 +175,7 @@ while test "$#" -gt 0; do
     ;;
 
   --configure)
-    echo " '--host=arm-linux-androideabi21' '--prefix=/home/jacob/code/android/ndk-cross-libs/armeabi-v7a' '--with-zlib' '--with-ssl=/home/jacob/code/android/ndk-cross-libs/armeabi-v7a' '--enable-ipv6' '--disable-ftp' '--disable-telnet' '--disable-smtp' '--disable-imap' '--disable-pop3' '--disable-smb' '--disable-gopher' '--disable-dict' '--disable-file' '--disable-tftp' '--disable-rtsp' '--disable-ldap' '--without-libpsl' '--with-ca-fallback' 'host_alias=arm-linux-androideabi21' 'CC=clang -target armv7a-linux-androideabi21' 'LDFLAGS=-L/home/jacob/code/android/ndk-cross-libs/armeabi-v7a/lib -lstdc++ -Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384' 'CPPFLAGS=-I/home/jacob/code/android/ndk-cross-libs/armeabi-v7a/include -fexceptions'"
+    echo " '--host=arm-linux-androideabi21' '--prefix=/home/jacob/code/android/ndk-cross-libs/armeabi-v7a' '--with-zlib' '--with-ssl=/home/jacob/code/android/ndk-cross-libs/armeabi-v7a' '--enable-ipv6' '--disable-ftp' '--disable-telnet' '--disable-smtp' '--disable-imap' '--disable-pop3' '--disable-smb' '--disable-gopher' '--disable-dict' '--disable-file' '--disable-tftp' '--disable-rtsp' '--disable-ldap' '--without-libpsl' '--with-ca-fallback' '--with-ca-path=/system/etc/security/cacerts' 'host_alias=arm-linux-androideabi21' 'CC=clang -target armv7a-linux-androideabi21' 'LDFLAGS=-L/home/jacob/code/android/ndk-cross-libs/armeabi-v7a/lib ' 'CPPFLAGS=-I/home/jacob/code/android/ndk-cross-libs/armeabi-v7a/include'"
     ;;
 
   *)
