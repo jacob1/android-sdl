@@ -28,6 +28,7 @@ case $ARCHITECTURE in
 		VER="21"
 		OPENSSL_ARCH="android-x86_64"
 		LUAJIT_HOSTCC="gcc"
+		export LDFLAGS="-Wl,-z,max-page-size=16384"
 		;;
 	x86)
 		HOSTPREFIX="i686-linux-android"
@@ -42,6 +43,7 @@ case $ARCHITECTURE in
 		VER="21"
 		OPENSSL_ARCH="android-arm64"
 		LUAJIT_HOSTCC="gcc"
+		export LDFLAGS="-Wl,-z,max-page-size=16384"
 		;;
 	armeabi-v7a)
 		# HOSTPREFIX and #COMPILEPREFIX are different for this arch in the ndk for some awful reason
@@ -115,7 +117,7 @@ export PREFIX=${CLANG_INSTALL_DIR}
 MAKE="make -j 16"
 
 # 16 KB page sizes. Applies to some libs and not all, but I just used ndk 28+ instead which automatically does it
-export LDFLAGS="-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384"
+#export LDFLAGS="-Wl,-z,max-page-size=16384 -Wl,-z,common-page-size=16384"
 
 log_error()
 {
@@ -250,10 +252,10 @@ openssl_install()
 	return $result
 }
 
-boringssl_url="https://github.com/google/boringssl/releases/download/0.20240930.0/boringssl-0.20240930.0.tar.gz"
-boringssl_md5="42997d6f9271ef32c073e27684923c7e"
-boringssl_filename="boringssl.tar.gz"
-boringssl_folder="/boringssl-0.20240930.0"
+boringssl_url="https://starcatcher.us/TPT/libs/boringssl.zip"
+boringssl_md5="ee5ffeff52b44b1caf0ec56e5a8c18a2"
+boringssl_filename="boringssl.zip"
+boringssl_folder="/boringssl"
 boringssl_extractfolder="tpt-libs/$ARCHITECTURE"
 boringssl_compile()
 {
@@ -261,7 +263,7 @@ boringssl_compile()
 	cmake -DANDROID_ABI=$ARCHITECTURE -DCMAKE_TOOLCHAIN_FILE=${ANDROID_NDK_HOME}/build/cmake/android.toolchain.cmake \
 			  -DANDROID_PLATFORM=android-${VER} \
               -DANDROID_NATIVE_API_LEVEL=$MIN_SDK_VERSION \
-              -DCMAKE_BUILD_TYPE=Release . && $MAKE
+              -DCMAKE_BUILD_TYPE=Release -DCMAKE_POLICY_VERSION_MINIMUM=3.5 . && $MAKE
 	result=$?
 	popd > /dev/null
 	return $result
@@ -270,7 +272,7 @@ boringssl_install()
 {
 	pushd $1 > /dev/null
 	mkdir -p $CLANG_INSTALL_DIR/lib
-	cp libssl.a $CLANG_INSTALL_DIR/lib && cp libcrypto.a $CLANG_INSTALL_DIR/lib && cp -r include $CLANG_INSTALL_DIR
+	cp ssl/libssl.a $CLANG_INSTALL_DIR/lib && cp crypto/libcrypto.a $CLANG_INSTALL_DIR/lib && cp -r include $CLANG_INSTALL_DIR
 	result=$?
 	popd > /dev/null
 	return $result
@@ -298,17 +300,18 @@ nghttp2_install()
 	return $result
 }
 
-curl_url="https://curl.se/download/curl-8.20.0.tar.gz"
-curl_md5="4f3a732b55b58a7c223f313510ca27c9"
-curl_filename="curl-8.20.0.tar.gz"
-curl_folder="/curl-8.20.0"
+curl_url="https://curl.se/download/curl-8.17.0.tar.gz"
+curl_md5="71e24b00f40a7503c1d07886e42d6305"
+curl_filename="curl-8.17.0.tar.gz"
+curl_folder="/curl-8.17.0"
 curl_extractfolder="tpt-libs/$ARCHITECTURE"
 curl_compile()
 {
 	pushd $1 > /dev/null
-	CPPFLAGS="-I$CLANG_INSTALL_DIR/include -fexceptions" LDFLAGS="-L$CLANG_INSTALL_DIR/lib -lstdc++ ${LDFLAGS}" ./configure --host=$HOST --prefix=$CLANG_INSTALL_DIR --with-zlib --with-ssl=${CLANG_INSTALL_DIR} --enable-ipv6 --disable-ftp --disable-telnet --disable-smtp --disable-imap --disable-pop3 --disable-smb --disable-gopher --disable-dict --disable-file --disable-tftp --disable-rtsp --disable-ldap --without-libpsl --with-ca-fallback --with-ca-path=/system/etc/security/cacerts && \
+	CPPFLAGS="-I$CLANG_INSTALL_DIR/include" LDFLAGS="-L$CLANG_INSTALL_DIR/lib ${LDFLAGS}" ./configure --host=$HOST --prefix=$CLANG_INSTALL_DIR --with-zlib --with-ssl=${CLANG_INSTALL_DIR} --enable-ipv6 --disable-ftp --disable-telnet --disable-smtp --disable-imap --disable-pop3 --disable-smb --disable-gopher --disable-dict --disable-file --disable-tftp --disable-rtsp --disable-ldap --without-libpsl --with-ca-fallback --with-ca-path=/system/etc/security/cacerts && \
 	$MAKE
 	# --with-ca-path=/system/etc/security/cacerts
+	# --with-ca-fallback --with-ca-path=/system/etc/security/cacerts --with-ca-embed=/etc/ssl/certs/ca-bundle.crt
 	result=$?
 	popd > /dev/null
 	return $result
@@ -330,7 +333,8 @@ luajit_extractfolder="tpt-libs/$ARCHITECTURE"
 luajit_compile()
 {
 	pushd $1 > /dev/null
-	$MAKE TARGET_SYS=Linux HOST_CC="${LUAJIT_HOSTCC}" CC="${CC}" STATIC_CC="${CC}" DYNAMIC_CC="${CC} -fPIC" TARGET_LD="${CC}" CROSS="${CLANG_BIN_PREFIX}" TARGET_AR="${AR} rcus" TARGET_STRIP="${STRIP}" RANLIB="${RANLIB}"
+	LDFLAGS2=${LDFLAGS}
+	LDFLAGS= $MAKE TARGET_SYS=Linux HOST_CC="${LUAJIT_HOSTCC}" CC="${CC}" STATIC_CC="${CC}" DYNAMIC_CC="${CC} -fPIC" TARGET_LD="${CC} ${LDFLAGS2}" CROSS="${CLANG_BIN_PREFIX}" TARGET_AR="${AR} rcus" TARGET_STRIP="${STRIP}" RANLIB="${RANLIB}"
 	result=$?
 	popd > /dev/null
 	return $result
